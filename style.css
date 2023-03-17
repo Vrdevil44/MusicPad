@@ -1,0 +1,140 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat:400,500,700,800,900');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  color: #282828;
+}
+
+#particles-js {
+  position: fixed;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right,#03276e,#000000,#000000,#000000,#000000, #000000,#6e0303);
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+}
+
+.section1 {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 500;
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  justify-items: center;
+  align-items: center;
+  gap: 12px;
+  border-radius: 30px;
+  width: 80vw;
+  height: 80vw;
+  max-width: 600px;
+  max-height: 600px;
+  transform-style: preserve-3d; /* enable 3D transformations */
+}
+.section {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 500;
+  right: 0;
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  justify-items: center;
+  align-items: center;
+  gap: 12px;
+  border-radius: 30px;
+  width: 80vw;
+  height: 80vw;
+  max-width: 600px;
+  max-height: 600px;
+  transform-style: preserve-3d; /* enable 3D transformations */
+}
+
+/* 3D transformation for each button */
+.key-pad {
+  background: linear-gradient(rgba(79, 27, 190, 0.4), rgba(79, 27, 190, 0.1));
+  color: white;
+  border: none;
+  border-radius: 12px;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-transform: lowercase;
+  backdrop-filter: blur(5px) brightness(120%);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+  transform-style: preserve-3d; /* enable 3D transformations */
+  transition: transform 0.3s ease; /* add transition effect on hover */
+}
+
+.key-pad:hover {
+  transform: translateY(-4px); /* move button up on hover */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* increase shadow size on hover */
+}
+
+/* add 3D effect to text */
+.key-pad h3 {
+  margin: 5px;
+  position: relative;
+  transform-style: preserve-3d; /* enable 3D transformations */
+  perspective: 1000px; /* set perspective */
+}
+
+.key-pad h3::before {
+  content: attr(data-label);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+  transform-origin: bottom center;
+  transform: rotateX(90deg) translateY(100%);
+  transition: transform 0.3s ease; /* add transition effect on hover */
+}
+
+.key-pad h3:hover::before {
+  transform: rotateX(0) translateY(0); /* flip and move label up on hover */
+}
+
+
+/* Responsive styles */
+@media screen and (max-width: 768px) {
+  .section {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    border-radius: 0;
+    padding: 12px;
+  }
+
+  .key-pad {
+    border-radius: 0;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .section {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(16, 1fr);
+    padding: 8px;
+  }
+}
+.section1 .space {
+  grid-column: 1 / span 4;
+}
