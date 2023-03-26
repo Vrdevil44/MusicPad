@@ -1,14 +1,16 @@
-@import url('https://fonts.googleapis.com/css?family=Montserrat:400,500,700,800,900');
+@font-face {
+  font-family: 'Nova Square';
+  src: url('fonts/nova-square.ttf') format('truetype');
+}
+
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
-
 body {
-  font-family: 'Montserrat', sans-serif;
-  color: #282828;
+  font-family: 'Nova Square', sans-serif;
 }
 
 #particles-js {
@@ -20,51 +22,94 @@ body {
   background-position: 50% 50%;
   background-repeat: no-repeat;
 }
+h1 {
+  padding: 30px;
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: white;
+  text-align: center;
+}
 
+.sectionp h1 {
+  padding: 10px;
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: white;
+  text-align: center;
+}
+.sectionh {
+  position: absolute;
+  left:5%;
+  margin: auto;
+  display: flex;
+  justify-items: center;
+  justify-content: center;
+  align-items: center;
+  border-radius: 30px;
+  width: 100%;
+  height: 100px;
+  max-width: 90%;
+  max-height: 100px;
+  transform-style: preserve-3d; /* enable 3D transformations */
+  background: linear-gradient(to top,rgba(79, 27, 190, 0.0), rgba(79, 27, 190, 0.2));
+  border: none;
+  padding-top:20px;
+  border-radius: 12px;
+  backdrop-filter: blur(5px) brightness(120%);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+  margin: 20px auto;
+}
+.sectionp {
+  position:absolute;
+  top:16.5%;
+  left:76%;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  border-radius: 30px;
+  width: 19%;
+  height: 78%;
+  max-width: 90%;
+  max-height: 78%;
+  transform-style: preserve-3d; /* enable 3D transformations */
+  background: linear-gradient(to right,rgba(79, 27, 190, 0.0), rgba(79, 27, 190, 0.2));
+  border: none;
+  padding-top:20px;
+  border-radius: 12px;
+  backdrop-filter: blur(5px) brightness(120%);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+  margin: 20px auto;
+}
 .section1 {
   position: fixed;
-  top: 0;
+  top: 150px;
   bottom: 0;
+  gap:10px;
   left: 0;
-  right: 500;
-  margin: auto;
+  right: 50%;
+  margin-left: 75px;
+  margin-top: 0px;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(4, 1fr);
+  grid-template-columns: repeat(8, 1fr); /* change to 8 columns */
+  grid-template-rows: repeat(4, 1fr); /* change to 4 rows */
   justify-items: center;
   align-items: center;
-  gap: 12px;
   border-radius: 30px;
-  width: 80vw;
-  height: 80vw;
-  max-width: 600px;
-  max-height: 600px;
+  width: 70%;
+  height: 70%;
+  max-width: 70%;
+  max-height: 70%;
   transform-style: preserve-3d; /* enable 3D transformations */
 }
-.section {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 500;
-  right: 0;
-  margin: auto;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(4, 1fr);
-  justify-items: center;
-  align-items: center;
-  gap: 12px;
-  border-radius: 30px;
-  width: 80vw;
-  height: 80vw;
-  max-width: 600px;
-  max-height: 600px;
-  transform-style: preserve-3d; /* enable 3D transformations */
-}
+
+
 
 /* 3D transformation for each button */
 .key-pad {
-  background: linear-gradient(rgba(79, 27, 190, 0.4), rgba(79, 27, 190, 0.1));
+  position: relative;
+  background: linear-gradient(rgba(79, 27, 190, 0.4), rgba(79, 27, 190, 0));
   color: white;
   border: none;
   border-radius: 12px;
@@ -72,9 +117,10 @@ body {
   width: 100%;
   display: flex;
   flex-direction: column;
+  overflow:hidden;
   align-items: center;
   justify-content: center;
-  text-transform: lowercase;
+  text-transform: uppercase;
   backdrop-filter: blur(5px) brightness(120%);
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
   transform-style: preserve-3d; /* enable 3D transformations */
@@ -113,6 +159,17 @@ body {
   transform: rotateX(0) translateY(0); /* flip and move label up on hover */
 }
 
+.time-bar {
+  position: absolute;
+  bottom: 0;
+  height: 25px;
+  background: linear-gradient(to bottom,rgba(255, 0, 0, 0.4),rgba(255, 0, 0, 0.2),rgba(255,0,0,0.1));
+  animation: juice-out 1s ease;
+  animation-fill-mode: forwards;
+  transform-origin: left;
+  width: 100%; /* add width property */
+}
+
 
 /* Responsive styles */
 @media screen and (max-width: 768px) {
@@ -137,4 +194,5 @@ body {
 }
 .section1 .space {
   grid-column: 1 / span 4;
+  
 }
