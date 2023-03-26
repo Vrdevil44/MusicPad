@@ -15,81 +15,101 @@
 <body>
 
     <div id="particles-js">
-      <div class="section1">
-        <div id="pad-113" class="orange key-pad" value="113"><h3>q</h3><small>Melody</small></div>
-        <div id="pad-119" class="yellow key-pad" value="119"><h3>w</h3><small>Melody 2</small></div>
-        <div id="pad-101" class="blue key-pad" value="101"><h3>e</h3><small>Drum</small></div>
-        <div id="pad-114" class="orange key-pad" value="114"><h3>r</h3><small>FX</small></div>
-
-
-        <div id="pad-97" class="orange key-pad" value="97"><h3>a</h3><small>Melody</small></div>
-        <div id="pad-115" class="yellow key-pad" value="115"><h3>s</h3><small>Melody 2</small></div>
-        <div id="pad-100" class="blue key-pad" value="100"><h3>d</h3><small>Drum</small></div>
-        <div id="pad-102" class="orange key-pad" value="102"><h3>f</h3><small>FX</small></div>
-
-
-        <div id="pad-122" class="orange key-pad" value="122"><h3>z</h3><small>Melody</small></div>
-        <div id="pad-120" class="yellow key-pad" value="120"><h3>x</h3><small>Melody 2</small></div>
-        <div id="pad-99" class="blue key-pad" value="99" data-type="drum"><h3>c</h3><small>Drum</small></div>
-        <div id="pad-118" class="orange key-pad" value="118"><h3>v</h3><small>FX</small></div>
-        <div class="space key-pad"><h3>space bar</h3><small>stop</small></div>
+      <div class="sectionh">
+        <h1>MusicPad</h1>
       </div>
-        <div class="section">
-          
-          <div id="pad-56" class="key-pad">
-            <h3>8</h3><small>chant</small>
-          </div>
-          <div id="pad-57" class="key-pad">
-            <h3>9</h3><small>malt</small>
-          </div>
-          <div id="pad-48" class="key-pad">
-            <h3>0</h3><small>snap</small>
-          </div>
-          <div id="pad-45" class="key-pad">
-            <h3>-</h3><small>blip</small>
-          </div>
+      <div class="section1">
+        <div id="pad-113" class="orange key-pad" value="113"><h3>q</h3><small>Melody</small><div class="time-bar" id="bar-113"></div></div>
+        <div id="pad-119" class="yellow key-pad" value="119"><h3>w</h3><small>Melody 2</small><div class="time-bar" id="bar-119"></div></div>
+        <div id="pad-101" class="blue key-pad" value="101"><h3>e</h3><small>Drum</small><div class="time-bar" id="bar-101"></div></div>
+        <div id="pad-114" class="orange key-pad" value="114"><h3>r</h3><small>FX</small><div class="time-bar" id="bar-114"></div></div>
+        
+        <div id="pad-56" class="key-pad">
+          <h3>8</h3><small>chant</small>
+          <div class="time-bar" id="bar-56"></div>
+        </div>
+        <div id="pad-57" class="key-pad">
+          <h3>9</h3><small>malt</small>
+          <div class="time-bar" id="bar-57"></div>
+        </div>
+        <div id="pad-48" class="key-pad">
+          <h3>0</h3><small>snap</small>
+          <div class="time-bar" id="bar-48"></div>
+        </div>
+        <div id="pad-45" class="key-pad">
+          <h3>-</h3><small>blip</small>
+          <div class="time-bar" id="bar-45"></div>
+        </div>
 
-          <div id="pad-117" class="key-pad">
-            <h3>u</h3><small>knock</small>
-          </div>
-          <div id="pad-105" class="key-pad">
-            <h3>i</h3><small>deep</small>
-          </div>
-          <div id="pad-111" class="key-pad">
-            <h3>o</h3><small>hihat open</small>
-          </div>
-          <div id="pad-112" class="key-pad">
-            <h3>p</h3><small>ting</small>
-          </div>
+        <div id="pad-97" class="orange key-pad" value="97"><h3>a</h3><small>Melody</small><div class="time-bar" id="bar-97"></div></div>
+        <div id="pad-115" class="yellow key-pad" value="115"><h3>s</h3><small>Melody 2</small><div class="time-bar" id="bar-115"></div></div>
+        <div id="pad-100" class="blue key-pad" value="100"><h3>d</h3><small>Drum</small><div class="time-bar" id="bar-100"></div></div>
+        <div id="pad-102" class="orange key-pad" value="102"><h3>f</h3><small>FX</small><div class="time-bar" id="bar-102"></div></div>
+        
+        <div id="pad-117" class="key-pad">
+          <h3>u</h3><small>knock</small>
+          <div class="time-bar" id="bar-117"></div>
+        </div>
+        <div id="pad-105" class="key-pad">
+          <h3>i</h3><small>deep</small>
+          <div class="time-bar" id="bar-105"></div>
+        </div>
+        <div id="pad-111" class="key-pad">
+          <h3>o</h3><small>hihat open</small>
+          <div class="time-bar" id="bar-111"></div>
+        </div>
+        <div id="pad-112" class="key-pad">
+          <h3>p</h3><small>ting</small>
+          <div class="time-bar" id="bar-112"></div>
+        </div>
 
-          <div id="pad-104" class="key-pad">
-            <h3>h</h3><small>snap dry</small>
-          </div>
-          <div id="pad-106" class="key-pad">
-            <h3>j</h3><small>bass low</small>
-          </div>
-          <div id="pad-107" class="key-pad">
-            <h3>k</h3><small>hihat closed</small>
-          </div>
-          <div id="pad-108" class="key-pad">
-            <h3>l</h3><small>tom</small>
-          </div>
-
-          <div id="pad-98" class="key-pad">
-            <h3>b</h3><small>bass</small>
-          </div>
-          <div id="pad-110" class="key-pad">
-            <h3>n</h3><small>rim</small>
-          </div>
-          <div id="pad-109" class="key-pad">
-            <h3>m</h3><small>snare</small>
-          </div>
-          <div id="pad-44" class="key-pad">
-            <h3>,</h3><small>clap</small>
-          </div>
+        <div id="pad-122" class="orange key-pad" value="122"><h3>z</h3><small>Melody</small><div class="time-bar" id="bar-122"></div></div>
+        <div id="pad-120" class="yellow key-pad" value="120"><h3>x</h3><small>Melody 2</small><div class="time-bar" id="bar-120"></div></div>
+        <div id="pad-99" class="blue key-pad" value="99" data-type="drum"><h3>c</h3><small>Drum</small><div class="time-bar" id="bar-99"></div></div>
+        <div id="pad-118" class="orange key-pad" value="118"><h3>v</h3><small>FX</small><div class="time-bar" id="bar-118"></div></div>
+        
+        <div id="pad-104" class="key-pad">
+          <h3>h</h3><small>snap dry</small>
+          <div class="time-bar" id="bar-104"></div>
+        </div>
+        <div id="pad-106" class="key-pad">
+          <h3>j</h3><small>bass low</small>
+          <div class="time-bar" id="bar-106"></div>
+        </div>
+        <div id="pad-107" class="key-pad">
+          <h3>k</h3><small>hihat closed</small>
+          <div class="time-bar" id="bar-107"></div>
+        </div>
+        <div id="pad-108" class="key-pad">
+          <h3>l</h3><small>tom</small>
+          <div class="time-bar" id="bar-108"></div>
+        </div>
+        
+        <div class="space key-pad"><h3>space bar</h3><small>stop</small></div> 
+        <div id="pad-98" class="key-pad">
+          <h3>b</h3><small>bass</small>
+          <div class="time-bar" id="bar-98"></div>
+        </div>
+        <div id="pad-110" class="key-pad">
+          <h3>n</h3><small>rim</small>
+          <div class="time-bar" id="bar-110"></div>
+        </div>
+        <div id="pad-109" class="key-pad">
+          <h3>m</h3><small>snare</small>
+          <div class="time-bar" id="bar-109"></div>
+        </div>
+        <div id="pad-44" class="key-pad">
+          <h3>,</h3><small>clap</small>
+          <div class="time-bar" id="bar-44"></div>
+        </div>
+        
+        
+        </div>
+        <div class="sectionp">
+          <h1>Tracks</h1>
         </div>
       </div>
-<script src="particles.js"></script>
+  <script src="particles.js"></script>
   <script type="text/javascript" src="jquery-3.3.1.min.js"></script>
   <script type="text/javascript" src="main.js"></script>
 </body>
