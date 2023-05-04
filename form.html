@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Music Pad</title>
     <link rel="stylesheet" type="text/css" href="Formstyle.css">
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
@@ -18,12 +20,15 @@
             <p>
                 Our platform is designed for musicians and music lovers of all levels, from beginners to professionals. Whether you want to create electronic dance music, hip hop beats, or anything in between, Music Pad has got you covered.
             </p>
-            <button class="btn mt-4" id="try-now-btn">Try Now -></button>
+            <a href="/index.html">
+              <button class="btn mt-4" id="try-now-btn">Try Now -></button>
+            </a>
+            
       </div>
         <div class="section0">
             <div class="pb-5 pt-5 pt-sm-2 text-center">
                 <h6 class="mb-0 pb-3" align="center"><span>Log In </span><span>Sign Up</span></h6>
-                      <input class="checkbox" type="checkbox" id="reg-log" name="reg-log"/>
+                      <input class="checkbox" type="checkbox" id="reg-log" name="reg-log" aria-label="Toggle between Log In and Sign Up"/>
                       <label for="reg-log"></label>
                 <div class="card-3d-wrap mx-auto">
                   <div class="card-3d-wrapper">
@@ -51,15 +56,15 @@
                           <h4 class="mb-4 pb-3" align="center">Sign Up</h4><br>
                           <form id="signup-form" class="section text-center" method="POST"></form>
                           <div class="form-group">
-                            <input type="text" name="logname" class="form-style" placeholder="Your Full Name" id="logname" autocomplete="off">
+                            <input type="text" name="signname" class="form-style" placeholder="Your Full Name" id="signname" autocomplete="off">
                             <i class="input-icon uil uil-user"></i>
                           </div><br>	
                           <div class="form-group mt-2">
-                            <input type="email" name="logemail" class="form-style" placeholder="Your Email" id="logemail" autocomplete="off">
+                            <input type="email" name="signmail" class="form-style" placeholder="Your Email" id="signmail" autocomplete="off">
                             <i class="input-icon uil uil-at"></i>
                           </div>	<br>
                           <div class="form-group mt-2">
-                            <input type="password" name="logpass" class="form-style" placeholder="Your Password" id="logpass" autocomplete="off">
+                            <input type="password" name="signpass" class="form-style" placeholder="Your Password" id="signpass" autocomplete="off">
                             <i class="input-icon uil uil-lock-alt"></i>
                           </div><br>
                           <a href="index.html" class="btn mt-4" onclick="return validateSignupForm() && submitForm()">SUBMIT</a>

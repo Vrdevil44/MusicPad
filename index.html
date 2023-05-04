@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
   <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Final Project</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="style.css">
@@ -17,6 +18,7 @@
     <div id="particles-js">
       <div class="sectionh">
         <h1>MusicPad</h1>
+        <button class="btn instructions-btn">Shift + R for Instructions</button>
       </div>
       <div class="section1">
         <div id="pad-113" class="orange key-pad" value="113"><h3>q</h3><small>Melody</small><div class="time-bar" id="bar-113"></div></div>
@@ -106,9 +108,30 @@
         
         </div>
         <div class="sectionp">
+          <div>
           <h1>Tracks</h1>
+          <div id="saved-tracks"></div>
         </div>
+        <div>
+          <button id="save-btn" class="save-btn">Save</button>
+
+        </div>
+
+        </div>
+
+        <!-- Instructions Modal -->
+<div id="instructions-modal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Instructions</h2>
+    <p>Here are the instructions for using the MusicPad:</p>
+    <p>Press Shift+R to close the instructions modal.</p>
+  </div>
+</div>
+
       </div>
+
+      
   <script src="particles.js"></script>
   <script type="text/javascript" src="jquery-3.3.1.min.js"></script>
   <script type="text/javascript" src="main.js"></script>
