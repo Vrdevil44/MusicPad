@@ -1,11 +1,21 @@
 document.addEventListener("DOMContentLoaded", function() {
   particlesJS.load('particles-js', 'particles.json', function() {
-    console.log('particles.js loaded - callback');
+    console.log('callback - particles.js config loaded');
   });
 });
 
 var BASE_URL = "https://github.com/Vrdevil44/MusicPad/raw/main/sounds";
 var audioBars = {};
+
+// Replace current audio system
+const audioEngine = new AudioEngine();
+
+// Preload common sounds
+document.addEventListener('DOMContentLoaded', () => {
+  ['113', '119', '101', '114'].forEach(keyCode => {
+    audioEngine.loadSound(keyCode);
+  });
+});
 
 $('body').on("keypress", function(e) {
   e.preventDefault();
@@ -13,7 +23,7 @@ $('body').on("keypress", function(e) {
   console.log('Keypress KeyCode: ' + e.keyCode);
 
   if (e.keyCode === 32) {
-    // Stop all audio and remove all bars when spacebar is pressed
+    // Only implements stop functionality
     for (var key in audioBars) {
       audioBars[key].audio.pause();
       audioBars[key].audio.currentTime = 0;
