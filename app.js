@@ -5,7 +5,8 @@
 
 document.addEventListener("DOMContentLoaded", function() {
     // Initialize the audio manager with the base URL for sounds
-    const BASE_URL = "https://github.com/Vrdevil44/MusicPad/raw/main/sounds";
+    // Using relative path instead of GitHub URL to avoid CORS issues
+    const BASE_URL = "./sounds";
     const audioManager = new AudioManager(BASE_URL);
     
     // Initialize the track recorder

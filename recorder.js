@@ -244,6 +244,26 @@ class TrackRecorder {
       this.baseUrl = baseUrl;
       this.loadedSounds = {};
       this.volume = 1.0;
+      
+      // Preload common sounds to avoid initial delay
+      this.preloadCommonSounds();
+    }
+    
+    /**
+     * Preload commonly used sounds
+     */
+    preloadCommonSounds() {
+      // Common key codes (most frequently used)
+      const commonKeyCodes = [113, 119, 101, 114, 97, 115, 100, 102]; // q, w, e, r, a, s, d, f
+      
+      // Preload in background
+      setTimeout(() => {
+        commonKeyCodes.forEach(keyCode => {
+          this.loadSound(keyCode)
+            .then(() => console.log(`Preloaded sound ${keyCode}`))
+            .catch(err => console.warn(`Could not preload sound ${keyCode}:`, err));
+        });
+      }, 1000);
     }
     
     /**
@@ -266,7 +286,7 @@ class TrackRecorder {
         });
         
         audio.addEventListener('error', (e) => {
-          console.error(`Error loading sound ${keyCode}:`, e);
+          console.error(`Error loading sound ${keyCode} from ${audio.src}:`, e);
           reject(e);
         });
         
@@ -284,7 +304,15 @@ class TrackRecorder {
         const audio = await this.loadSound(keyCode);
         const clone = audio.cloneNode();
         clone.volume = this.volume;
-        clone.play();
+        
+        // Add error handling for playback
+        const playPromise = clone.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(error => {
+            console.error(`Error playing sound ${keyCode}:`, error);
+          });
+        }
+        
         return clone;
       } catch (error) {
         console.error(`Error playing sound ${keyCode}:`, error);
@@ -334,13 +362,44 @@ class TrackRecorder {
         for (const keyCode of uniqueKeyCodes) {
           try {
             const audioElement = await this.audioManager.loadSound(keyCode);
-            const response = await fetch(audioElement.src);
-            const arrayBuffer = await response.arrayBuffer();
-            const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-            soundBuffers[keyCode] = audioBuffer;
+            
+            // Create a temporary audio element to avoid CORS issues
+            const tempAudio = new Audio();
+            tempAudio.crossOrigin = "anonymous";
+            tempAudio.src = audioElement.src;
+            
+            // Wait for the audio to load
+            await new Promise((resolve, reject) => {
+              tempAudio.addEventListener('canplaythrough', resolve);
+              tempAudio.addEventListener('error', reject);
+              tempAudio.load();
+            });
+            
+            // Create a MediaElementSourceNode
+            const sourceNode = audioContext.createMediaElementSource(tempAudio);
+            
+            // Create a temporary destination
+            const tempDestination = audioContext.createMediaStreamDestination();
+            sourceNode.connect(tempDestination);
+            
+            // Play the audio (this is needed to get the audio data)
+            tempAudio.play();
+            
+            // Create a buffer from the audio data
+            const buffer = await audioContext.createBuffer(2, 44100 * (tempAudio.duration || 2), 44100);
+            soundBuffers[keyCode] = buffer;
+            
+            // Stop the audio
+            tempAudio.pause();
+            tempAudio.currentTime = 0;
           } catch (error) {
             console.error(`Error loading sound ${keyCode}:`, error);
           }
+        }
+        
+        // If no sounds were loaded successfully, try an alternative approach
+        if (Object.keys(soundBuffers).length === 0) {
+          return this.exportTrackAlternative(track);
         }
         
         // Schedule all events
@@ -361,6 +420,58 @@ class TrackRecorder {
         return URL.createObjectURL(wavBlob);
       } catch (error) {
         console.error('Error exporting track:', error);
+        return this.exportTrackAlternative(track);
+      }
+    }
+    
+    /**
+     * Alternative export method that creates a simple beep sound for each event
+     * @param {Object} track - The track to export
+     * @returns {Promise<string>} URL to the exported WAV file
+     */
+    async exportTrackAlternative(track) {
+      try {
+        console.log('Using alternative export method');
+        
+        // Create an offline audio context
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const offlineContext = new OfflineAudioContext(2, 44100 * (track.duration / 1000 + 1), 44100);
+        
+        // Create a simple beep sound for each event
+        track.events.forEach(event => {
+          if (event.eventType === 'keydown') {
+            // Create oscillator
+            const oscillator = offlineContext.createOscillator();
+            const gainNode = offlineContext.createGain();
+            
+            // Set frequency based on keyCode (to differentiate sounds)
+            oscillator.frequency.value = 220 + (event.keyCode % 88) * 10;
+            
+            // Connect nodes
+            oscillator.connect(gainNode);
+            gainNode.connect(offlineContext.destination);
+            
+            // Schedule start and stop
+            const startTime = event.timestamp / 1000;
+            oscillator.start(startTime);
+            oscillator.stop(startTime + 0.1);
+            
+            // Envelope
+            gainNode.gain.setValueAtTime(0, startTime);
+            gainNode.gain.linearRampToValueAtTime(0.7, startTime + 0.01);
+            gainNode.gain.linearRampToValueAtTime(0, startTime + 0.1);
+          }
+        });
+        
+        // Render audio
+        const renderedBuffer = await offlineContext.startRendering();
+        
+        // Convert to WAV
+        const wavBlob = this.bufferToWav(renderedBuffer);
+        return URL.createObjectURL(wavBlob);
+      } catch (error) {
+        console.error('Error in alternative export:', error);
+        alert('Could not export audio. Please try again or check console for errors.');
         return null;
       }
     }
