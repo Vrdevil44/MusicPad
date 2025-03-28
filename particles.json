@@ -7,6 +7,11 @@
         "value_area": 800
       }
     },
+    "limit": 100,
+    "optimize": {
+      "mobile": true,
+      "tablet": true
+    },
     "color": {
       "value": "#ffffff"
     },

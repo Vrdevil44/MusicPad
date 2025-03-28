@@ -52,6 +52,26 @@ class MusicPadUI {
           <input type="range" id="volume-slider" min="0" max="100" value="100">
           <i class="fas fa-volume-up"></i>
         </div>
+        <div class="advanced-controls">
+          <div class="bpm-control">
+            <label>BPM</label>
+            <input type="number" value="120" min="60" max="200">
+          </div>
+          <div class="quantize-control">
+            <label>Quantize</label>
+            <input type="checkbox" checked>
+          </div>
+          <div class="export-options">
+            <select>
+              <option value="wav">WAV</option>
+              <option value="mp3">MP3</option>
+            </select>
+            <select>
+              <option value="44100">44.1kHz</option>
+              <option value="48000">48kHz</option>
+            </select>
+          </div>
+        </div>
       `;
       
       // Insert after the header

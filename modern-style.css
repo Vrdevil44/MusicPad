@@ -106,13 +106,25 @@
   
   /* Control Panel */
   .control-panel {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
+    position: relative;
+    z-index: 10;
     display: flex;
-    gap: 10px;
-    z-index: 1000;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background: rgba(19, 19, 31, 0.7);
+    border: 1px solid rgba(123, 104, 238, 0.3);
+    border-radius: var(--border-radius);
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-strong);
+    margin: 20px auto;
+    width: 90%;
+    max-width: 1200px;
+    transition: var(--transition-normal);
+  }
+  
+  .control-panel:hover {
+    box-shadow: var(--shadow-strong), 0 0 20px rgba(123, 104, 238, 0.3);
   }
   
   .control-buttons {
@@ -543,20 +555,5 @@
       width: 100%;
       justify-content: center;
     }
-  }
-  
-  .record-button {
-    background: var(--color-accent);
-    border: none;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .record-button.active {
-    animation: pulse 1s infinite;
-    background: #ff4444;
   }
   

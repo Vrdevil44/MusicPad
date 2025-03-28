@@ -9,23 +9,35 @@ class TrackRecorder {
       this.startTime = 0;
       this.events = [];
       this.currentTrack = null;
+      this.bufferSize = 0;
+      this.maxBufferSize = 1024 * 1024 * 10; // 10MB limit
+      this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      this.tracks = [];
     }
     
     /**
      * Start recording a new track
      */
     startRecording() {
-      this.isRecording = true;
-      this.startTime = Date.now();
-      this.events = [];
-      console.log('Recording started');
-      
-      // Add visual recording indicator
-      const recordIndicator = document.createElement('div');
-      recordIndicator.id = 'record-indicator';
-      recordIndicator.className = 'record-indicator';
-      recordIndicator.innerHTML = '<span>●</span> Recording...';
-      document.body.appendChild(recordIndicator);
+      try {
+        if (!this.audioContext) {
+          throw new Error('Audio Context not available');
+        }
+        this.isRecording = true;
+        this.startTime = Date.now();
+        this.events = [];
+        console.log('Recording started');
+        
+        // Add visual recording indicator
+        const recordIndicator = document.createElement('div');
+        recordIndicator.id = 'record-indicator';
+        recordIndicator.className = 'record-indicator';
+        recordIndicator.innerHTML = '<span>●</span> Recording...';
+        document.body.appendChild(recordIndicator);
+      } catch (error) {
+        console.error('Recording failed:', error);
+        return false;
+      }
     }
     
     /**
@@ -96,6 +108,10 @@ class TrackRecorder {
       this.timeouts = [];
       this.startTime = 0;
       this.onLoopComplete = null;
+      this.bpm = 120;
+      this.quantize = true;
+      this.loops = new Map();
+      this.masterClock = null;
     }
     
     /**
@@ -236,6 +252,13 @@ class TrackRecorder {
           padElement.classList.remove('playing');
         }, 200);
       }
+    }
+    
+    // Add quantization method
+    quantizeTime(timestamp) {
+      if (!this.quantize) return timestamp;
+      const beatDuration = 60000 / this.bpm;
+      return Math.round(timestamp / beatDuration) * beatDuration;
     }
   }
   
