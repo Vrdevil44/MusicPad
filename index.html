@@ -4,6 +4,9 @@
 <head>
   <meta charset="utf-8">
   <title>Final Project</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Rajdhani:wght@300;400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css"
@@ -109,9 +112,20 @@
           <h1>Tracks</h1>
         </div>
       </div>
-  <script src="particles.js"></script>
-  <script type="text/javascript" src="jquery-3.3.1.min.js"></script>
-  <script type="text/javascript" src="main.js"></script>
+      <div class="controls-panel">
+        <div class="volume-controls">
+          <input type="range" id="master-volume" min="0" max="100" />
+          <div class="track-volumes">
+            <!-- Individual track volume controls -->
+          </div>
+        </div>
+        <div class="sound-pack-selector">
+          <!-- Sound pack selection interface -->
+        </div>
+      </div>
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <script src="jquery-3.3.1.min.js"></script>
+  <script src="main.js"></script>
 </body>
 
 </html>

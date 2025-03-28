@@ -3,6 +3,27 @@
   src: url('fonts/nova-square.ttf') format('truetype');
 }
 
+:root {
+  --font-primary: 'Orbitron', sans-serif;
+  --font-secondary: 'Rajdhani', sans-serif;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-primary);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.key-pad h3 {
+  font-family: var(--font-primary);
+  font-weight: 700;
+}
+
+.key-pad small {
+  font-family: var(--font-secondary);
+  font-weight: 500;
+  letter-spacing: 1px;
+}
 
 * {
   margin: 0;
@@ -109,9 +130,13 @@ h1 {
 /* 3D transformation for each button */
 .key-pad {
   position: relative;
-  background: linear-gradient(rgba(79, 27, 190, 0.4), rgba(79, 27, 190, 0));
+  background: linear-gradient(
+    45deg,
+    rgba(41, 41, 92, 0.7),
+    rgba(62, 62, 143, 0.4)
+  );
   color: white;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   height: 100%;
   width: 100%;
@@ -121,49 +146,41 @@ h1 {
   align-items: center;
   justify-content: center;
   text-transform: uppercase;
-  backdrop-filter: blur(5px) brightness(120%);
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 15px rgba(62, 62, 143, 0.2);
   transform-style: preserve-3d; /* enable 3D transformations */
-  transition: transform 0.3s ease; /* add transition effect on hover */
+  transition: all 0.3s ease; /* add transition effect on hover */
 }
 
 .key-pad:hover {
-  transform: translateY(-4px); /* move button up on hover */
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* increase shadow size on hover */
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 5px 20px rgba(62, 62, 143, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* add 3D effect to text */
 .key-pad h3 {
-  margin: 5px;
-  position: relative;
-  transform-style: preserve-3d; /* enable 3D transformations */
-  perspective: 1000px; /* set perspective */
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  margin: 0;
+  font-size: 1.5em;
 }
 
-.key-pad h3::before {
-  content: attr(data-label);
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
-  transform-origin: bottom center;
-  transform: rotateX(90deg) translateY(100%);
-  transition: transform 0.3s ease; /* add transition effect on hover */
-}
-
-.key-pad h3:hover::before {
-  transform: rotateX(0) translateY(0); /* flip and move label up on hover */
+.key-pad small {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8em;
+  margin-top: 5px;
 }
 
 .time-bar {
   position: absolute;
   bottom: 0;
   height: 25px;
-  background: linear-gradient(to bottom,rgba(255, 0, 0, 0.4),rgba(255, 0, 0, 0.2),rgba(255,0,0,0.1));
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.1)
+  );
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
   animation: juice-out 1s ease;
   animation-fill-mode: forwards;
   transform-origin: left;

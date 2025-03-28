@@ -1,5 +1,7 @@
-particlesJS.load('particles-js', 'particles.json', function() {
-  console.log('callback - particles.js config loaded');
+document.addEventListener("DOMContentLoaded", function() {
+  particlesJS.load('particles-js', 'particles.json', function() {
+    console.log('particles.js loaded - callback');
+  });
 });
 
 var BASE_URL = "https://github.com/Vrdevil44/MusicPad/raw/main/sounds";
@@ -89,4 +91,13 @@ $('body').on("keyup", function(e) {
     }
   }
 });
+
+// Add error handling for audio loading
+function loadAudio(keyCode) {
+  return new Promise((resolve, reject) => {
+    const audio = new Audio(`${BASE_URL}/${keyCode}.wav`);
+    audio.addEventListener('canplaythrough', () => resolve(audio));
+    audio.addEventListener('error', (e) => reject(e));
+  });
+}
 
