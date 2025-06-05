@@ -27,7 +27,13 @@ function submitForm() {
     xhr.open("POST", "/signup");
     xhr.onload = function() {
       if (xhr.status === 200) {
-        var response = success;//JSON.parse(xhr.responseText);
+        var response;
+        try {
+          response = JSON.parse(xhr.responseText);
+        } catch (e) {
+          console.error('Failed to parse signup response', e);
+          return;
+        }
         if (response.success) {
           // Redirect to the home page
           window.location.href = "/index.html";
@@ -46,7 +52,13 @@ function submitForm() {
     xhr.open("POST", "/login");
     xhr.onload = function() {
       if (xhr.status === 200) {
-        var response = success;//JSON.parse(xhr.responseText);
+        var response;
+        try {
+          response = JSON.parse(xhr.responseText);
+        } catch (e) {
+          console.error('Failed to parse login response', e);
+          return;
+        }
         if (response.success) {
           // Redirect to the home page
           window.location.href = "/index.html";
