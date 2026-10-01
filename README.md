@@ -1,11 +1,12 @@
 # MusicPad
 An interactive music pad with interactive css body.
 
-Landing Page - form.html
-![image](https://user-images.githubusercontent.com/125772875/227759349-7febeaa0-0d23-4297-aa85-909a87564081.png)
+**🎵 [Try it live](https://vrdevil44.github.io/MusicPad/)** — no login, just press keys and play.
 
-Login-Signup Form
-![image](https://user-images.githubusercontent.com/125772875/227759392-0d292aae-2ea3-4b71-b4f1-86c47cd58eb6.png)
+## How to play
+- Press keyboard keys (Q–P, A–L, Z–M, digits, etc.) or click the pads to trigger the 28 built-in samples.
+- **Spacebar** stops all playback.
+- Use the **Record / Play / Loop / Stop / Download** controls to capture and export your beats as WAV.
 
 MusicPad - Play Around
 ![image](https://user-images.githubusercontent.com/125772875/227759415-c26a863b-4228-4afa-8174-41f4969854f1.png)
