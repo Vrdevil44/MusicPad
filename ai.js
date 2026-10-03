@@ -16,6 +16,9 @@ const BEAT_RECIPES = {
   bhangra: { bpm: 100, kick: [1, 5, 9, 13], snare: [5, 13], hat: [2, 4, 6, 8, 10, 12, 14, 16], perc: [3, 7, 11, 15] }
 };
 
+// Bhangra on the Desi kit (kick=dhol bass, snare=dhol treble, hat=tabla na, perc=chatt): dhol-style phrasing
+const DESI_BHANGRA = { bpm: 100, kick: [1, 4, 9, 12], snare: [5, 7, 13, 15], hat: [3, 11, 16], perc: [2, 6, 8, 10, 14] };
+
 const VIBE_KEYWORDS = [
   ['trap', /trap|dark|hiphop|rap/],
   ['bhangra', /punjabi|bhangra|desi|dhol/],
@@ -33,7 +36,8 @@ const BeatEngine = {
   /** Local recipe for a vibe name or free text (copy, so callers can't mutate the map). */
   localRecipe(vibeOrText) {
     const key = BEAT_RECIPES[vibeOrText] ? vibeOrText : this.vibeFromText(vibeOrText);
-    return JSON.parse(JSON.stringify(BEAT_RECIPES[key]));
+    const desi = key === 'bhangra' && typeof DesiKit !== 'undefined' && DesiKit.active;
+    return JSON.parse(JSON.stringify(desi ? DESI_BHANGRA : BEAT_RECIPES[key]));
   },
 
   /** Strict validation of untrusted model output. Returns a clean recipe or null. */
