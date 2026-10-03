@@ -271,7 +271,7 @@ class Sequencer {
   }
 
   playBuffer(keyCode, time, maxDur, velocity = 1) {
-    const buffer = this.buffers[keyCode];
+    const buffer = DesiKit.bufferFor(keyCode) || this.buffers[keyCode];
     if (!buffer) return;
     const src = this.ctx.createBufferSource();
     const gain = this.ctx.createGain();

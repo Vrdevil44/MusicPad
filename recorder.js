@@ -366,6 +366,11 @@ class TrackRecorder {
      * @returns {HTMLAudioElement} The audio element
      */
     async playSound(keyCode) {
+      // Desi kit swaps the sample for a synthesized voice
+      if (typeof DesiKit !== 'undefined' && DesiKit.has(keyCode)) {
+        DesiKit.play(keyCode, this.volume);
+        return null;
+      }
       try {
         const audio = await this.loadSound(keyCode);
         const clone = audio.cloneNode();

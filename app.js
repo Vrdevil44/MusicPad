@@ -27,6 +27,10 @@ document.addEventListener("DOMContentLoaded", function() {
     const loopRecorder = new QuantizedLoopRecorder(trackRecorder.audioContext, sequencer);
     new SequencerUI(sequencer, loopRecorder).init();
     
+    // Desi kit: synthesized dhol/tabla voices + Original/Desi switcher
+    DesiKit.init(trackRecorder.audioContext);
+    DesiKit.buildSwitcher();
+    
     // Set up the existing key press functionality
     setupExistingKeyboardHandling(audioManager);
     
@@ -72,6 +76,7 @@ document.addEventListener("DOMContentLoaded", function() {
         // Create a new audio element for the time bar animation
         var audio = new Audio(`${audioManager.baseUrl}/${e.keyCode}.wav`);
         audioBars[e.keyCode] = {audio: audio, bar: $bar};
+        audio.muted = DesiKit.has(e.keyCode); // time bar only; the Desi voice plays via WebAudio
         audio.play();
         
         // Visual feedback
@@ -113,6 +118,7 @@ document.addEventListener("DOMContentLoaded", function() {
       // Create a new audio element for the time bar animation
       var audio = new Audio(`${audioManager.baseUrl}/${keyCode}.wav`);
       audioBars[keyCode] = {audio: audio, bar: $bar};
+      audio.muted = DesiKit.has(keyCode);
       audio.play();
       
       // Visual feedback
