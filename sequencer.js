@@ -163,9 +163,9 @@ class Sequencer {
     return this.loopSteps.some(s => s.length > 0);
   }
 
-  /** Compact, URL-safe snapshot of every layer + BPM (recorded loop hits are not included). */
+  /** Compact, URL-safe snapshot of every layer + BPM + kit (recorded loop hits are not included). v2 appends the kit byte; v1 links still decode. */
   encodeBeat() {
-    const bytes = [1, this.bpm, this.layers.length];
+    const bytes = [2, this.bpm, this.layers.length];
     this.layers.forEach(l => {
       bytes.push(l.muted ? 1 : 0);
       l.pattern.forEach(row => {
@@ -174,6 +174,7 @@ class Sequencer {
         bytes.push(bits & 255, bits >> 8);
       });
     });
+    bytes.push((typeof DesiKit !== 'undefined' && DesiKit.active) ? 1 : 0);
     return btoa(String.fromCharCode.apply(null, bytes))
       .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   }
@@ -184,9 +185,11 @@ class Sequencer {
       const b64 = String(str).replace(/-/g, '+').replace(/_/g, '/');
       const raw = atob(b64 + '==='.slice((b64.length + 3) % 4));
       const bytes = Array.from(raw, c => c.charCodeAt(0));
+      const ver = bytes[0];
       const n = bytes[2];
       const rowBytes = SEQ_VOICES.length * 2;
-      if (bytes[0] !== 1 || !(n >= 1 && n <= SEQ_MAX_LAYERS) || bytes.length !== 3 + n * (1 + rowBytes)) return false;
+      const expectLen = 3 + n * (1 + rowBytes) + (ver === 2 ? 1 : 0);
+      if ((ver !== 1 && ver !== 2) || !(n >= 1 && n <= SEQ_MAX_LAYERS) || bytes.length !== expectLen) return false;
       if (!(bytes[1] >= 60 && bytes[1] <= 180)) return false;
       this.setBpm(bytes[1]);
       let p = 3;
@@ -203,6 +206,7 @@ class Sequencer {
         this.layers[li] = fresh;
       });
       this.activeLayer = 0;
+      if (ver === 2 && typeof DesiKit !== 'undefined') DesiKit.setActive(bytes[p] === 1);
       return true;
     } catch (e) {
       return false;
