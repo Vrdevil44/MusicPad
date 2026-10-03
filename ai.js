@@ -18,9 +18,9 @@ const BEAT_RECIPES = {
 
 const VIBE_KEYWORDS = [
   ['trap', /trap|dark|hiphop|rap/],
+  ['bhangra', /punjabi|bhangra|desi|dhol/],
   ['boombap', /boom|jazz|old school|90s/],
-  ['house', /house|dance|edm|party|club/],
-  ['bhangra', /punjabi|bhangra|desi|dhol/]
+  ['house', /house|dance|edm|party|club/]
 ];
 
 const BeatEngine = {
