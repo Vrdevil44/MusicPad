@@ -5,6 +5,7 @@
  */
 
 const SEQ_STEPS = 16;
+const SEQ_MAX_LAYERS = 3;
 
 // Drum voices mapped to the existing sample key codes in sounds/
 const SEQ_VOICES = [
@@ -30,9 +31,10 @@ class Sequencer {
     this.bpm = 90;
     this.playing = false;
 
-    this.pattern = SEQ_VOICES.map(() => new Array(SEQ_STEPS).fill(false));
-    // Recorded performance, quantized: loopSteps[step] = [keyCodes]
-    this.loopSteps = Array.from({ length: SEQ_STEPS }, () => []);
+    // Up to SEQ_MAX_LAYERS layers, all played together. Each owns a grid, its own
+    // quantized recorded performance (loopSteps[step] = [keyCodes]) and a mute flag.
+    this.layers = Array.from({ length: SEQ_MAX_LAYERS }, () => Sequencer.createLayer());
+    this.activeLayer = 0; // layer selected for editing / recording
 
     this.lookahead = 0.15;  // seconds scheduled ahead of the audio clock
     this.tickMs = 25;       // how often the scheduler wakes up
@@ -49,6 +51,39 @@ class Sequencer {
     this.buffers = {};
     this.loading = {};
     SEQ_VOICES.forEach(v => this.loadBuffer(v.keyCode));
+  }
+
+  static createLayer() {
+    return {
+      pattern: SEQ_VOICES.map(() => new Array(SEQ_STEPS).fill(false)),
+      loopSteps: Array.from({ length: SEQ_STEPS }, () => []),
+      muted: false,
+      // Humanize data (set by the beat generator): timing offset in seconds, velocity 0..1
+      timing: SEQ_VOICES.map(() => new Array(SEQ_STEPS).fill(0)),
+      vel: SEQ_VOICES.map(() => new Array(SEQ_STEPS).fill(1))
+    };
+  }
+
+  /** The selected layer's grid / loop; the UI and recorder work against these. */
+  get layer() {
+    return this.layers[this.activeLayer];
+  }
+
+  get pattern() {
+    return this.layer.pattern;
+  }
+
+  get loopSteps() {
+    return this.layer.loopSteps;
+  }
+
+  selectLayer(i) {
+    if (i >= 0 && i < this.layers.length) this.activeLayer = i;
+  }
+
+  toggleMute(i) {
+    this.layers[i].muted = !this.layers[i].muted;
+    return this.layers[i].muted;
   }
 
   get stepDuration() {
@@ -77,20 +112,42 @@ class Sequencer {
   }
 
   toggleStep(voiceIndex, step) {
-    this.pattern[voiceIndex][step] = !this.pattern[voiceIndex][step];
-    return this.pattern[voiceIndex][step];
+    const layer = this.layer;
+    layer.pattern[voiceIndex][step] = !layer.pattern[voiceIndex][step];
+    layer.timing[voiceIndex][step] = 0; // hand edits are un-humanized
+    layer.vel[voiceIndex][step] = 1;
+    return layer.pattern[voiceIndex][step];
   }
 
   clearPattern() {
-    this.pattern.forEach(row => row.fill(false));
+    const layer = this.layer;
+    layer.pattern.forEach(row => row.fill(false));
+    layer.timing.forEach(row => row.fill(0));
+    layer.vel.forEach(row => row.fill(1));
+  }
+
+  /**
+   * Load a recipe ({bpm, kick:[], snare:[], hat:[], perc:[]}, 1-indexed) onto the
+   * selected layer. opts.humanize adds timing jitter and hat velocity variation.
+   */
+  loadRecipe(recipe, opts = {}) {
+    if (recipe.bpm) this.setBpm(recipe.bpm);
+    this.clearPattern();
+    const layer = this.layer;
+    SEQ_VOICES.forEach((v, i) => {
+      (recipe[v.id] || []).forEach(n => {
+        const s = n - 1;
+        layer.pattern[i][s] = true;
+        if (opts.humanize) {
+          layer.timing[i][s] = (Math.random() * 2 - 1) * 0.003; // +-3ms
+          layer.vel[i][s] = v.id === 'hat' ? 0.65 + Math.random() * 0.35 : 0.9 + Math.random() * 0.1;
+        }
+      });
+    });
   }
 
   loadDemo() {
-    this.setBpm(SEQ_DEMO.bpm);
-    SEQ_VOICES.forEach((v, i) => {
-      this.pattern[i].fill(false);
-      SEQ_DEMO[v.id].forEach(s => (this.pattern[i][s - 1] = true));
-    });
+    this.loadRecipe(SEQ_DEMO);
   }
 
   addLoopHit(step, keyCode) {
@@ -104,6 +161,52 @@ class Sequencer {
 
   hasLoop() {
     return this.loopSteps.some(s => s.length > 0);
+  }
+
+  /** Compact, URL-safe snapshot of every layer + BPM (recorded loop hits are not included). */
+  encodeBeat() {
+    const bytes = [1, this.bpm, this.layers.length];
+    this.layers.forEach(l => {
+      bytes.push(l.muted ? 1 : 0);
+      l.pattern.forEach(row => {
+        let bits = 0;
+        row.forEach((on, s) => { if (on) bits |= 1 << s; });
+        bytes.push(bits & 255, bits >> 8);
+      });
+    });
+    return btoa(String.fromCharCode.apply(null, bytes))
+      .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+
+  /** Restore from encodeBeat() output. Returns false (and changes nothing) if invalid. */
+  decodeBeat(str) {
+    try {
+      const b64 = String(str).replace(/-/g, '+').replace(/_/g, '/');
+      const raw = atob(b64 + '==='.slice((b64.length + 3) % 4));
+      const bytes = Array.from(raw, c => c.charCodeAt(0));
+      const n = bytes[2];
+      const rowBytes = SEQ_VOICES.length * 2;
+      if (bytes[0] !== 1 || !(n >= 1 && n <= SEQ_MAX_LAYERS) || bytes.length !== 3 + n * (1 + rowBytes)) return false;
+      if (!(bytes[1] >= 60 && bytes[1] <= 180)) return false;
+      this.setBpm(bytes[1]);
+      let p = 3;
+      this.layers.forEach((layer, li) => {
+        const fresh = Sequencer.createLayer();
+        if (li < n) {
+          fresh.muted = bytes[p++] === 1;
+          fresh.pattern.forEach(row => {
+            const bits = bytes[p] | (bytes[p + 1] << 8);
+            p += 2;
+            for (let s = 0; s < SEQ_STEPS; s++) row[s] = !!(bits & (1 << s));
+          });
+        }
+        this.layers[li] = fresh;
+      });
+      this.activeLayer = 0;
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   start() {
@@ -147,16 +250,19 @@ class Sequencer {
 
   scheduleStep(step, time) {
     const keyCodes = [];
-    SEQ_VOICES.forEach((v, i) => {
-      if (this.pattern[i][step]) {
-        this.playBuffer(v.keyCode, time, v.maxDur);
-        keyCodes.push(v.keyCode);
-      }
-    });
     const loopMax = this.stepDuration * SEQ_STEPS;
-    this.loopSteps[step].forEach(code => {
-      this.playBuffer(code, time, loopMax);
-      keyCodes.push(code);
+    this.layers.forEach(layer => {
+      if (layer.muted) return;
+      SEQ_VOICES.forEach((v, i) => {
+        if (layer.pattern[i][step]) {
+          this.playBuffer(v.keyCode, Math.max(time + layer.timing[i][step], this.ctx.currentTime), v.maxDur, layer.vel[i][step]);
+          keyCodes.push(v.keyCode);
+        }
+      });
+      layer.loopSteps[step].forEach(code => {
+        this.playBuffer(code, time, loopMax);
+        keyCodes.push(code);
+      });
     });
 
     this.recentSteps.push({ step, time });
@@ -164,13 +270,13 @@ class Sequencer {
     this.visualQueue.push({ step, time, keyCodes });
   }
 
-  playBuffer(keyCode, time, maxDur) {
+  playBuffer(keyCode, time, maxDur, velocity = 1) {
     const buffer = this.buffers[keyCode];
     if (!buffer) return;
     const src = this.ctx.createBufferSource();
     const gain = this.ctx.createGain();
     src.buffer = buffer;
-    const vol = this.audioManager.volume;
+    const vol = this.audioManager.volume * velocity;
     const dur = Math.min(maxDur, buffer.duration);
     gain.gain.setValueAtTime(vol, time);
     if (dur < buffer.duration) {
