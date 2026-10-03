@@ -22,6 +22,11 @@ document.addEventListener("DOMContentLoaded", function() {
     const ui = new MusicPadUI(trackRecorder, loopPlayer, audioManager, audioExporter);
     ui.init();
     
+    // Step sequencer + quantized loop recorder share the recorder's AudioContext
+    const sequencer = new Sequencer(trackRecorder.audioContext, audioManager);
+    const loopRecorder = new QuantizedLoopRecorder(trackRecorder.audioContext, sequencer);
+    new SequencerUI(sequencer, loopRecorder).init();
+    
     // Set up the existing key press functionality
     setupExistingKeyboardHandling(audioManager);
     
