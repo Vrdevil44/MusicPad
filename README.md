@@ -3,6 +3,16 @@ An interactive music pad with interactive css body.
 
 **🎵 [Try it live](https://vrdevil44.github.io/MusicPad/)** — no login, just press keys and play.
 
+## What's new: the instrument update
+
+MusicPad now features a 16-step sequencer with precise WebAudio-clock timing. You can toggle cells, adjust the tempo between 60 and 180 BPM, and use the transport controls to play or stop your pattern.
+
+We have added a loop recorder that captures your live keypresses, quantizes them to the grid, and loops them back. You can manage three stackable layers with individual mute toggles. To get started quickly, use the one-tap demo button to load a 90 BPM boom bap beat.
+
+Sharing is now simple. Your entire beat, including the selected kit, is encoded into the URL for easy sharing. We also introduced a Desi kit featuring synthesized dhol and tabla sounds, which works seamlessly with all pads and the sequencer.
+
+Finally, the new AI beat engine helps you generate patterns using vibe chips or custom descriptions. These patterns include humanized timing and remain fully editable. You can also connect your own Gemini API key in the description box to generate beats from open-ended prompts.
+
 ## How to play
 - Press keyboard keys (Q–P, A–L, Z–M, digits, etc.) or click the pads to trigger the 28 built-in samples.
 - **Spacebar** stops all playback.
