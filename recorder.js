@@ -4,14 +4,14 @@
  */
 
 class TrackRecorder {
-    constructor() {
+    constructor(audioContext) {
       this.isRecording = false;
       this.startTime = 0;
       this.events = [];
       this.currentTrack = null;
       this.bufferSize = 0;
       this.maxBufferSize = 1024 * 1024 * 10; // 10MB limit
-      this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      this.audioContext = audioContext || new (window.AudioContext || window.webkitAudioContext)();
       this.tracks = [];
     }
     
@@ -98,6 +98,49 @@ class TrackRecorder {
     }
   }
   
+  /**
+   * Quantized loop recorder: captures live key presses and snaps each one to the
+   * nearest 16th-note step of the running Sequencer, which then loops them.
+   * The timestamp recorder above is untouched; this is the new path.
+   */
+  class QuantizedLoopRecorder extends TrackRecorder {
+    constructor(audioContext, sequencer) {
+      super(audioContext);
+      this.sequencer = sequencer;
+      this.isLoopRecording = false;
+      this.onChange = null;
+      document.addEventListener('keydown', (e) => this.handleKeyDown(e));
+    }
+
+    startLoopRecording() {
+      this.isLoopRecording = true;
+    }
+
+    stopLoopRecording() {
+      this.isLoopRecording = false;
+      if (this.onChange) this.onChange();
+    }
+
+    clearLoop() {
+      this.sequencer.clearLoop();
+    }
+
+    handleKeyDown(e) {
+      if (!this.isLoopRecording || e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+      if (!e.key || e.key.length !== 1) return;
+      const keyCode = e.key.toLowerCase().charCodeAt(0); // matches the sample file names (keypress codes)
+      if (!document.getElementById('pad-' + keyCode)) return;
+      this.recordQuantized(keyCode, this.audioContext.currentTime);
+    }
+
+    recordQuantized(keyCode, time) {
+      const step = this.sequencer.stepAtTime(time);
+      if (step === null) return;
+      this.sequencer.addLoopHit(step, keyCode);
+      if (this.onChange) this.onChange();
+    }
+  }
+
   class LoopPlayer {
     constructor(audioManager) {
       this.audioManager = audioManager;
