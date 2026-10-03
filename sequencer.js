@@ -323,6 +323,7 @@ class SequencerUI {
   init() {
     this.build();
     this.bind();
+    this.readHash();
     this.syncAll();
   }
 
@@ -348,6 +349,24 @@ class SequencerUI {
         <button id="seq-clear-btn" class="control-btn">Clear grid</button>
         <button id="seq-rec-btn" class="control-btn"><i class="fas fa-circle"></i> Rec loop</button>
         <button id="seq-clearloop-btn" class="control-btn" disabled>Clear loop</button>
+      </div>
+      <div class="seq-bar seq-layers">
+        ${Array.from({ length: SEQ_MAX_LAYERS }, (_, i) => `
+          <span class="seq-layer" data-layer="${i}">
+            <button class="control-btn seq-layer-tab" data-layer="${i}">Layer ${i + 1}</button>
+            <button class="control-btn seq-layer-mute" data-layer="${i}" aria-label="Mute layer ${i + 1}" title="Mute layer ${i + 1}"><i class="fas fa-volume-up"></i></button>
+          </span>`).join('')}
+        <button id="seq-copy-btn" class="control-btn"><i class="fas fa-link"></i> Copy link</button>
+      </div>
+      <div class="seq-bar seq-ai">
+        <button id="seq-gen-btn" class="control-btn"><i class="fas fa-magic"></i> Generate</button>
+        ${['trap', 'boombap', 'house', 'bhangra'].map(v =>
+          `<button class="control-btn seq-chip" data-vibe="${v}">${{ trap: 'Trap', boombap: 'Boom bap', house: 'House', bhangra: 'Bhangra' }[v]}</button>`).join('')}
+        <form id="seq-describe" class="seq-describe">
+          <input type="text" id="seq-describe-input" maxlength="200" placeholder="Describe a beat, e.g. dark late-night rap" autocomplete="off">
+          <button type="submit" class="control-btn">Go</button>
+        </form>
+        <span id="seq-ai-hint" class="seq-loop-badge"></span>
       </div>
       <div class="seq-grid">${rows}</div>
     `;
@@ -384,6 +403,13 @@ class SequencerUI {
       .seq-cell.beat { background: rgba(255,255,255,0.14); }
       .seq-cell.on { background: #ff9d1c; border-color: #ffd08a; }
       .seq-cell.head { box-shadow: inset 0 0 0 2px rgba(255,255,255,0.85); }
+      .seq-layer { display: inline-flex; gap: 2px; }
+      .seq-layer-tab.selected { background: rgba(255, 157, 28, 0.6); font-weight: 700; }
+      .seq-layer.muted .seq-layer-tab { opacity: 0.45; }
+      .seq-chip.selected { background: rgba(255, 157, 28, 0.6); }
+      .seq-describe { display: flex; gap: 6px; flex: 1 1 220px; }
+      .seq-describe input { flex: 1; min-width: 0; padding: 6px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2);
+        background: rgba(255,255,255,0.08); color: white; }
       .seq-loop-badge { font-size: 12px; opacity: 0.8; }
       @media (max-width: 600px) {
         .seq-grid { grid-template-columns: 40px repeat(16, minmax(20px, 1fr)); }
@@ -406,6 +432,7 @@ class SequencerUI {
       const on = this.seq.toggleStep(+cell.dataset.voice, +cell.dataset.step);
       this.paintCell(cell, on);
       cell.blur();
+      this.writeHash();
     });
 
     press('demo-btn', () => {
@@ -416,6 +443,7 @@ class SequencerUI {
       this.seq.loadDemo();
       $('seq-bpm').value = this.seq.bpm;
       this.syncAll();
+      this.writeHash();
       this.demoActive = true;
       if (!this.seq.playing) this.startTransport();
       this.syncButtons();
@@ -435,6 +463,7 @@ class SequencerUI {
       this.seq.clearPattern();
       this.demoActive = false;
       this.syncAll();
+      this.writeHash();
     });
 
     press('seq-rec-btn', () => {
@@ -452,8 +481,82 @@ class SequencerUI {
       this.syncButtons();
     });
 
+    this.panel.querySelectorAll('.seq-layer-tab').forEach(b =>
+      b.addEventListener('click', () => {
+        this.seq.selectLayer(+b.dataset.layer);
+        b.blur();
+        this.syncAll();
+      }));
+    this.panel.querySelectorAll('.seq-layer-mute').forEach(b =>
+      b.addEventListener('click', () => {
+        this.seq.toggleMute(+b.dataset.layer);
+        b.blur();
+        this.syncButtons();
+        this.writeHash();
+      }));
+
+    press('seq-copy-btn', () => {
+      this.writeHash();
+      const url = location.href;
+      const done = () => this.hint('Link copied');
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(done, () => this.hint(url));
+      } else {
+        this.hint(url);
+      }
+    });
+
+    // Local smart brain: Generate re-rolls the current vibe (default Boom bap)
+    this.vibe = this.vibe || 'boombap';
+    press('seq-gen-btn', () => this.applyRecipe(BeatEngine.localRecipe(this.vibe)));
+    this.panel.querySelectorAll('.seq-chip').forEach(c =>
+      c.addEventListener('click', () => {
+        this.vibe = c.dataset.vibe;
+        this.applyRecipe(BeatEngine.localRecipe(this.vibe));
+        c.blur();
+      }));
+
+    $('seq-describe').addEventListener('submit', async e => {
+      e.preventDefault();
+      const text = $('seq-describe-input').value.trim();
+      if (!text) return;
+      const recipe = await BeatEngine.fromDescription(text);
+      this.vibe = BeatEngine.vibeFromText(text);
+      this.applyRecipe(recipe);
+    });
+    $('seq-describe-input').addEventListener('keydown', e => e.stopPropagation()); // typing must not trigger pads
+    $('seq-describe-input').addEventListener('keypress', e => e.stopPropagation());
+    if (!GEMINI_API_KEY) this.hint('Describe box needs a Gemini key (see ai.js); Generate and the vibe chips work offline.', true);
+
     // Hand-played notes recorded into the loop may change the clear-loop state
     this.rec.onChange = () => this.syncButtons();
+  }
+
+  /** Load a recipe onto the selected layer (humanized), keep it editable, and start playing. */
+  applyRecipe(recipe) {
+    this.seq.loadRecipe(recipe, { humanize: true });
+    this.demoActive = false;
+    this.syncAll();
+    this.writeHash();
+    if (!this.seq.playing) this.startTransport();
+  }
+
+  hint(msg, sticky) {
+    const el = document.getElementById('seq-ai-hint');
+    el.textContent = msg;
+    clearTimeout(this.hintTimer);
+    if (!sticky) this.hintTimer = setTimeout(() => this.hint(this.stickyHint || '', true), 2500);
+    else this.stickyHint = msg;
+  }
+
+  writeHash() {
+    history.replaceState(null, '', '#b=' + this.seq.encodeBeat());
+  }
+
+  /** Restore a shared beat from the URL hash, if present and valid. */
+  readHash() {
+    const m = /^#b=([A-Za-z0-9_-]+)$/.exec(location.hash);
+    if (m && this.seq.decodeBeat(m[1])) this.syncAll();
   }
 
   startTransport() {
@@ -526,6 +629,14 @@ class SequencerUI {
     $('seq-rec-btn').classList.toggle('active', rec);
     $('seq-rec-btn').innerHTML = rec
       ? '<i class="fas fa-square"></i> Stop rec' : '<i class="fas fa-circle"></i> Rec loop';
+    this.panel.querySelectorAll('.seq-layer').forEach(el => {
+      const i = +el.dataset.layer;
+      const muted = this.seq.layers[i].muted;
+      el.classList.toggle('muted', muted);
+      el.querySelector('.seq-layer-tab').classList.toggle('selected', i === this.seq.activeLayer);
+      el.querySelector('.seq-layer-mute').innerHTML = `<i class="fas fa-volume-${muted ? 'mute' : 'up'}"></i>`;
+    });
+    this.panel.querySelectorAll('.seq-chip').forEach(c => c.classList.toggle('selected', c.dataset.vibe === this.vibe));
     $('seq-clearloop-btn').disabled = !this.seq.hasLoop();
   }
 }
